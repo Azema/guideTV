@@ -205,7 +205,7 @@
 						</xsl:choose>
 </xsl:attribute><xsl:attribute name="class">channelimage</xsl:attribute></img></xsl:if></td></tr></table>
 		</th>
-		<xsl:variable name="theseprogrammes" select="$programmes[@channel=current()/@id]"/>
+		<xsl:variable name="theseprogrammes" select="$programmes[@channel=current()/@id][not(@showview=preceding-sibling::programme/@showview)]"/>
 		<xsl:for-each select="$theseprogrammes">                                           <!--Program Stop Time is after Display Start   and Program Stop Time is before Display End......or...Program Start Time is after Display Start and Program Start Time is before Display End........or  Program Start Time is before Display Start and Program Stop Time is after Display End. -->
 		<xsl:sort select="@start"/>
 		<xsl:variable name="StartTime">
