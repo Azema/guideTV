@@ -57,7 +57,9 @@
         <xsl:value-of select="div[@class='resume_long']"/>
       </desc>
       <category lang="fr">
-        <xsl:value-of select="div[@class='Type']"/>
+        <xsl:call-template name="categories">
+          <xsl:with-param name="category" select="div[@class='Type']"/>
+        </xsl:call-template>
       </category>
       <length units="seconds">
         <xsl:value-of select="div[@class='DureeEnSecondes']"/>
@@ -92,6 +94,18 @@
       <xsl:when test="contains($noteToTransform, '6')">
         <star-rating>0/5</star-rating>
       </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="categories">
+    <xsl:param name="category"/>
+    <xsl:choose>
+      <xsl:when test="contains($category, 'Dessin animé')">
+        <xsl:text>Children</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+          <xsl:value-of select="$category"/>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
