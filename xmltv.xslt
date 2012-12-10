@@ -78,16 +78,13 @@
     <xsl:param name="noteToTransform"/>
     <xsl:choose>
       <xsl:when test="contains($noteToTransform, '1')">
-        <star-rating>5/5</star-rating>
+        <star-rating>2/5</star-rating>
       </xsl:when>
       <xsl:when test="contains($noteToTransform, '2')">
-        <star-rating>4/5</star-rating>
-      </xsl:when>
-      <xsl:when test="contains($noteToTransform, '3')">
         <star-rating>3/5</star-rating>
       </xsl:when>
-      <xsl:when test="contains($noteToTransform, '4')">
-        <star-rating>2/5</star-rating>
+      <xsl:when test="contains($noteToTransform, '3')">
+        <star-rating>4/5</star-rating>
       </xsl:when>
       <xsl:when test="contains($noteToTransform, '5')">
         <star-rating>1/5</star-rating>
