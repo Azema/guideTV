@@ -20,6 +20,7 @@ foreach ($domChannels as $domChannel) {
     $channel = new Channel();
     $id = $domChannel->getAttribute('id');
     $channel->id = substr($id, strpos($id, '_')+1);
+    $channel->setIcon($channel->id);
     $domChaine = $xpath->query('div[@class="chaine"]', $domChannel)->item(0);
     $channel->name = $domChaine->getAttribute('title');
     $domPrograms = $xpath->query('div[@class="programme"]/div[starts-with(@class, "emission")]/div/div[starts-with(@id, "data_")]', $domChaine);
@@ -44,6 +45,10 @@ class Channel
      */
     public $name;
     /**
+     * @var string
+     */
+    public $icon;
+    /**
      * @var Program[]
      */
     public $programs = array();
@@ -51,6 +56,13 @@ class Channel
     public function addProgram($program)
     {
         $this->programs[] = $program;
+        return $this;
+    }
+
+    public function setIcon($icon)
+    {
+        $this->icon = 'http://icon-telerama.sdv.fr/tele/imedia/images_chaines_tra/Transparent/40x40/'
+            . $icon . '.gif';
         return $this;
     }
 }
@@ -72,7 +84,7 @@ class Program
     /**
      * @var string
      */
-    public $subTitre;
+    public $subTitle;
     /**
      * @var string
      */
@@ -155,7 +167,8 @@ class Program
         $this->id = $object->Id_Emission;
         $this->start = strtotime($object->Date_Debut);
         $this->stop = strtotime($object->Date_Fin);
-        $this->title = $object->Titre;
+        $this->title = trim($object->Titre);
+        $this->subTitle = trim($object->Sous_Titre);
         $this->url = 'http://television.telerama.fr/tele/programmes-tv/'
             . $object->Titre_Url . ',' . $this->id . '.php';
         $this->showView = $object->ShowView;
@@ -196,6 +209,12 @@ class Program
     public function setLength($length, $unit = 'seconds')
     {
         $this->length = new Length();
+        if ($unit == 'minutes') {
+            $length = $length * 60;
+        } elseif ($unit == 'hours') {
+            $length = $length * 60 * 60;
+        }
+        $unit = 'seconds';
         $this->length->number = $length;
         $this->length->unit = $unit;
     }
