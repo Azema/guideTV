@@ -8,8 +8,8 @@ $xsl->importStyleSheet($doc);
 
 $doc->load(__DIR__ . '/a.xml');
 $data = $xsl->transformToXML($doc);
-file_put_contents(__DIR__.'/result.html', $data);
-
+//file_put_contents(__DIR__.'/result.html', $data);
+libxml_use_internal_errors(true);
 $doc = new DOMDocument();
 $doc->loadHTML($data);
 $xpath = new DOMXPath($doc);
@@ -32,7 +32,42 @@ foreach ($domChannels as $domChannel) {
     }
     $chaines[] = $channel;
 }
-var_dump($chaines);
+$view = new View();
+$view->channels = $chaines;
+$view->startHour = 15;
+$view->endHour = 19;
+$view->beginDate = mktime(15, 0, 0, 11, 12, 2012);
+$view->endDate = mktime(19, 0, 0, 11, 12, 2012);
+echo $view->run(dirname(__FILE__).'/templates/grille.php');
+
+class View
+{
+
+    /**
+     * Processes a view script and returns the output.
+     *
+     * @param string $name The script name to process.
+     * @return string The script output.
+     */
+    public function render($name)
+    {
+        // find the script file name using the parent private method
+        $this->_file = $this->_script($name);
+        unset($name); // remove $name from local scope
+
+        ob_start();
+        $this->_run($this->_file);
+
+        return $this->_filter(ob_get_clean()); // filter output
+    }
+
+    public function run($file)
+    {
+        ob_start();
+        include $file;
+        return ob_get_clean(); // filter output
+    }
+}
 
 class Channel
 {
@@ -165,8 +200,8 @@ class Program
     public function fromObject($object)
     {
         $this->id = $object->Id_Emission;
-        $this->start = strtotime($object->Date_Debut);
-        $this->stop = strtotime($object->Date_Fin);
+        $this->start = $this->buildDatetime($object->Date_Debut);
+        $this->stop = $this->buildDatetime($object->Date_Fin);
         $this->title = trim($object->Titre);
         $this->subTitle = trim($object->Sous_Titre);
         $this->url = 'http://television.telerama.fr/tele/programmes-tv/'
@@ -178,6 +213,17 @@ class Program
         $this->setEpisode($object->episode_numero, $object->saison_numero);
         $this->desc = trim($object->resume_long);
         $this->setCredits($object->intervenant);
+    }
+
+    public function buildDatetime($date)
+    {
+        // 2012-12-11 16:35:00
+        $tmp = explode(' ', trim($date));
+        $date = $tmp[0];
+        $time = $tmp[1];
+        $tmpDate = explode('-', $date);
+        $tmpTime = explode(':', $time);
+        return mktime($tmpTime[0], $tmpTime[1], 0, $tmpDate[2], $tmpDate[1], $tmpDate[0]);
     }
 
     public function setStarRating($note)
